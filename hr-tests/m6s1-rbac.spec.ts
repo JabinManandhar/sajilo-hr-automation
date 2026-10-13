@@ -36,18 +36,41 @@ test.describe("Role-based access", { tag: "@rbac" }, () => {
     await expect(employeePage.getByTestId("payroll-total")).toHaveCount(0);
   });
 
-//   Warm-up exercises
+  //   Warm-up exercises
   /* P1 · HR sees Staff, but not Payroll
 Using hrPage, check the menu has a Staff link, has no Payroll link, and the badge says HR. */
-  
-test("P1: HR sees Staff, but not Payroll",{tag:'@warm-up'}, async ({
-    hrPage,
-  }) => {
+
+  test(
+    "P1: HR sees Staff, but not Payroll",
+    { tag: "@warm-up" },
+    async ({ hrPage }) => {
+      await hrPage.goto("/dashboard");
+      await expect(hrPage.getByText("Namaste, Sita Gurung")).toBeVisible();
+      const nav = hrPage.getByRole("navigation", { name: "Main" });
+      await expect(nav.getByRole("link", { name: "My leave" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "Payroll" })).toHaveCount(0);
+    },
+  );
+
+  /* P2 · Find Gita in Pokhara
+As HR, open /staff. Check the Staff table has the right number of rows, and that Gita Adhikari's row says Pokhara. */
+  test("P2 Find Gita in Pokhara", { tag: "@warm-up" }, async ({ hrPage }) => {
     await hrPage.goto("/dashboard");
     await expect(hrPage.getByText("Namaste, Sita Gurung")).toBeVisible();
     const nav = hrPage.getByRole("navigation", { name: "Main" });
-    await expect(nav.getByRole("link", { name: "My leave" })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Payroll" })).toHaveCount(0);
+    await expect(nav.getByRole("link", { name: "Staff" })).toBeVisible();
+    await hrPage.goto("/staff");
+    await expect(
+      hrPage.getByRole("heading", { name: "Staff directory" }),
+    ).toBeVisible();
+
+    // table rows count
+    const rowCount = await hrPage
+      .getByRole("table", { name: "Staff" })
+      .getByRole("row")
+      .count();
+
+    expect(rowCount).toBe(7); //six rows for table body + one row for heading
   });
 });
 
