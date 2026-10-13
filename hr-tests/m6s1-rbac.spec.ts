@@ -24,3 +24,19 @@ test.describe('Role-based access', { tag: '@rbac' }, () => {
     await expect(employeePage.getByTestId('payroll-total')).toHaveCount(0);
   });
 });
+
+test.describe('Payroll API', { tag: ['@rbac', '@api'] }, () => {
+  test('401 without a token', async ({ request }) => {
+    const response = await request.get('/api/payroll');
+    expect(response.status()).toBe(401);
+  });
+
+  test('403 for an employee token', async ({ request, employeeToken }) => {
+    const response = await request.get('/api/payroll', {
+      headers: { Authorization: `Bearer ${employeeToken}` },
+    });
+    expect(response.status()).toBe(403);
+    const body = await response.json();
+    expect(body.message).toBe('Forbidden: requires role ADMIN');
+  });
+});
