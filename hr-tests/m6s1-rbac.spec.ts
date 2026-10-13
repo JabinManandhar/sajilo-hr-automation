@@ -71,6 +71,14 @@ As HR, open /staff. Check the Staff table has the right number of rows, and that
       .count();
 
     expect(rowCount).toBe(7); //six rows for table body + one row for heading
+
+    // verify Gita has the branch "Pokhara"
+    const gitaRow = hrPage
+      .getByRole("row")
+      .filter({ hasText: "Gita Adhikari" })
+      .filter({ hasText: "Pokhara" });
+
+    await expect(gitaRow).toBeVisible();
   });
 });
 
